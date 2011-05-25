@@ -23,11 +23,17 @@ exports.exportUsers = function(){
 exports.all = function(callback){
   db.all("SELECT * FROM entries LIMIT 50", callback);
 }
+exports.allOrders = function(callback){
+  db.all("SELECT * FROM orders", callback);
+}
 exports.push = function(user, message){
   db.run("INSERT INTO entries (id, user, message, timestamp) VALUES (NULL, ?, ?, ?)", user, message, (new Date()).getTime());
 }
-exports.order = function(user, text, price) {
-  db.run("INSERT INTO orders (id, user, text, price, timestamp) VALUES (NULL, ?, ?, ?)", user, text, price, (new Date()).getTime());
+exports.order = function(user, text, price, callback) {
+  db.serialize(function(){
+    db.run("INSERT INTO orders (id, user, text, price, timestamp) VALUES (NULL, ?, ?, ?, ?)", user, text, price, (new Date()).getTime());
+    db.all("SELECT * FROM orders", callback);
+  });
 }
 exports.verify = function(user, callback) {
   db.get("SELECT * FROM users WHERE email = ? LIMIT 1", user, callback);

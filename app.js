@@ -71,17 +71,23 @@ socket.on('connection', function(client){
             client.send({buffer: rows});
           }
           config.all(_und.bind(callback, this));
+          var callbackOrders = function(err, rows){
+            client.send({orders: rows});
+          }
+          config.allOrders(_und.bind(callbackOrders, this));
         } else {
           client.send({disconnect: true});
         }
       }
       config.verify(request.name, verifyCallback);
     } else if(request.order) {
+      console.log(request.order)
       var client_name = getClient(client);
-      var orderCallback = function(err){
+      var orderCallback = function(err, rows){
         client.broadcast({ announcement: [client_name , 'made order'] });
+        client.send({orders : rows});
       }
-      config.order(client_name, request.order.text, request.order.price);
+      config.order(client_name, request.order.text, request.order.price, orderCallback);
     }
   });
 

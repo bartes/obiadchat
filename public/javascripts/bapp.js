@@ -13,20 +13,30 @@ function message(obj){
   }
   $('#chat').append(el).scrollTop(1000000);
 }
-
+function refreshOrder(data){
+  $('#orders').html("").append($("<h3>Order:</h3>"))
+  var el;
+  $.each(data, function() {
+    el = $("<p>");
+    el.html('<b>' + this.user + '</b>:' + this.text + " - " + this.price);
+    $('#orders').append(el);
+  });
+}
 $("form").live("submit", function(){
   var t = $(this).find("input[type=text]");
   var value = t.val();
   var obj, subelements;
   if(value.length === 0 ) {
     return;
-  } else if(subelements = value.match(/\:\!([\s\w,.]*)\|\|([\s\w,.]*)/)) {
+  }
+  var subelements = value.match(/\:\!([\s\w,.]*)\|\|([\s\w,.]*)/);
+  if(subelements) {
     obj = { order : {text: subelements[1], price: subelements[2]}}
   } else {
     obj = { message: value };
+    message({ message: ['you', value] });
   }
-  socket.send(json({message:value}));
-  message({ message: ['you', value] });
+  socket.send(json(obj));
   t.val("");
   return false;
 });
@@ -37,6 +47,8 @@ socket.on('message', function(obj){
     $.each(obj.buffer, function() {
       message({message: [this.user, this.message]});
     });
+  } else if (obj.orders) {
+    refreshOrder(obj.orders)
   } else if (obj.disconnect){
     socket.disconnect();
   } else {
