@@ -4,3 +4,8 @@ task('remigrate', [], function (params) {
   var config = require("./config");
   config.reinit();
 });
+task('users', [], function (params) {
+  console.log('putting users to DB');
+  var config = require("./config");
+  config.exportUsers();
+});

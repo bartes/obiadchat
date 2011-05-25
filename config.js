@@ -1,4 +1,5 @@
 var sqlite = require('sqlite3').verbose();
+var _und = require("underscore");
 var users = require('./users').config();
 var db = exports.db = new sqlite.Database('./chat.db');
 exports.reinit = function(){
@@ -13,9 +14,9 @@ exports.reinit = function(){
 }
 exports.exportUsers = function(){
   db.serialize(function(){
-    db.run("INSERT INTO entries (id, user, message, timestamp) VALUES (NULL, ?, ?, ?)", user, message, (new Date()).getTime());
-    db.run("INSERT INTO entries (id, user, message, timestamp) VALUES (NULL, ?, ?, ?)", user, message, (new Date()).getTime());
-    db.run("INSERT INTO entries (id, user, message, timestamp) VALUES (NULL, ?, ?, ?)", user, message, (new Date()).getTime());
+    _und.each(users,function(user){
+      db.run("INSERT INTO users (id, email) VALUES (NULL, ?)", user);
+    })
     db.close();
   });
 }

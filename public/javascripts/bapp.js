@@ -37,6 +37,8 @@ socket.on('message', function(obj){
     $.each(obj.buffer, function() {
       message({message: [this.user, this.message]});
     });
+  } else if (obj.disconnect){
+    socket.disconnect();
   } else {
     message(obj);
   }
