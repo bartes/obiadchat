@@ -29,7 +29,7 @@ $("form").live("submit", function(){
   if(value.length === 0 ) {
     return;
   }
-  var subelements = value.match(/\:\!([\s\w,.]*)\|\|([\s\w,.]*)/);
+  var subelements = value.match(/\:\!([\s\w,.]*);([\s\w,.]*)/);
   if(subelements) {
     obj = { order : {text: subelements[1], price: subelements[2]}}
   } else {
