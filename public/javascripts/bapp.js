@@ -1,4 +1,4 @@
-var identifier = parent.window.$("#gbi4m1").text();
+var id, identifier = (id = parent.window.$("#gbi4m1")) ? id.text() : parent.window.$("gbi4m1").innerText ;
 var socket = new io.Socket(null, {port: 8081, rememberTransport: false});
 var json = JSON.stringify;
 function message(obj){
