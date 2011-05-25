@@ -51,6 +51,10 @@ app.get('/chat', function(req, res, next){
     title: 'Obiad Chat'
   });
 });
+
+var getClient = function(client){
+  return sessions[client.sessionId.toString()];
+}
 // Only listen on $ node app.js
 if (!module.parent) {
   app.listen(8081);
@@ -69,18 +73,30 @@ socket.on('connection', function(client){
   client.on('message', function(message_json){
     request = JSON.parse(message_json);
     if(request.message){
-      var client_name = sessions[client.sessionId.toString()];
+      var client_name = getClient(client);
       var msg = { message: [client_name, request.message] };
       config.push(client_name, request.message);
       client.broadcast(msg);
     } else if(request.name) {
-      sessions[client.sessionId.toString()] = request.name;
-      client.broadcast({ announcement: [request.name , 'connected'] });
+      var verifyCallback = function(err, row){
+        console.log(row);
+        console.log(err);
+        sessions[client.sessionId.toString()] = row.email;
+        client.broadcast({ announcement: [row.email , 'connected'] });
+      }
+      config.verify(request.name, verifyCallback);
+    } else if(request.order) {
+      var client_name = getClient(client);
+      var orderCallback = function(err){
+        client.broadcast({ announcement: [client_name , 'made order'] });
+      }
+      config.order(client_name, request.order.text, request.order.price);
     }
   });
 
   client.on('disconnect', function(){
     var client_name = sessions[client.sessionId.toString()];
+    delete sessions[client.sessionId.toString()];
     client.broadcast({ announcement: [client_name, 'disconnected'] });
   });
 })

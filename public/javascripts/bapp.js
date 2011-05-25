@@ -17,8 +17,13 @@ function message(obj){
 $("form").live("submit", function(){
   var t = $(this).find("input[type=text]");
   var value = t.val();
+  var obj, subelements;
   if(value.length === 0 ) {
     return;
+  } else if(subelements = value.match(/\:\!([\s\w,.]*)\|\|([\s\w,.]*)/)) {
+    obj = { order : {text: subelements[1], price: subelements[2]}}
+  } else {
+    obj = { message: value };
   }
   socket.send(json({message:value}));
   message({ message: ['you', value] });
