@@ -7,7 +7,6 @@ function message(obj){
   }
   if(obj.message) {
     el.html('<b>' + obj.message[0] + ':</b> ' + obj.message[1]);
-    console.log(obj.message[0], obj.message[1]);
   }
   $('#chat').append(el).scrollTop(1000000);
 }
@@ -27,8 +26,8 @@ $("form").live("submit", function(){
   if(value.length === 0 ) {
     return;
   }
-  var vorder = value.match(/\:\+([^;]+)[;]*([^;]*)/);
-  var vdisorder = value.match(/\:\-*/);
+  var vorder = value.match(/^\:\+([^;]+)[;]*([^;]*)/);
+  var vdisorder = value.match(/^\:\-/);
   if(!$(this).prop("emailconfirmed")){
     socket.connect();
     $(this).prop("email", value);
