@@ -109,5 +109,7 @@ socket.on('connection', function(client){
     var client_name = sessions[client.sessionId.toString()];
     delete sessions[client.sessionId.toString()];
     client.broadcast({ announcement: [client_name, 'disconnected'] });
+    client.send({members: _und.uniq(_und.values(sessions))});
+    client.broadcast({members: _und.uniq(_und.values(sessions))});
   });
 })
