@@ -1,8 +1,6 @@
-var id, identifier = (id = parent.window.$("#gbi4m1")) ? id.text() : parent.window.$("gbi4m1").innerText ;
 var socket = new io.Socket(null, {port: 8081, rememberTransport: false});
 var json = JSON.stringify;
 function message(obj){
-  console.log(obj)
   var el = $("<p>");
   if(obj.announcement){
     el.html('<em>' + obj.announcement + '</em>');
@@ -31,7 +29,11 @@ $("form").live("submit", function(){
   }
   var vorder = value.match(/\:\+([^;]+)[;]*([^;]*)/);
   var vdisorder = value.match(/\:\-*/);
-  if(vorder) {
+  if(!$(this).prop("emailconfirmed")){
+    socket.connect();
+    $(this).prop("email", value);
+    obj = { name : value };
+  } else if(vorder) {
     obj = { order : {text: vorder[1], price: vorder[2]}};
   } else if(vdisorder){
     obj = { disorder : true};
@@ -39,6 +41,7 @@ $("form").live("submit", function(){
     obj = { message: value };
     message({ message: ['you', value] });
   }
+
   socket.send(json(obj));
   t.val("");
   return false;
@@ -46,12 +49,13 @@ $("form").live("submit", function(){
 
 socket.on('message', function(obj){
   if (obj.buffer){
+    $("form").prop("emailconfirmed", $("form").prop("email"));
     $('#chat').html("");
     $.each(obj.buffer, function() {
       message({message: [this.user, this.message]});
     });
   } else if (obj.orders) {
-    refreshOrder(obj.orders)
+    refreshOrder(obj.orders);
   } else if (obj.disconnect){
     socket.disconnect();
   } else {
@@ -60,13 +64,13 @@ socket.on('message', function(obj){
 });
 
 socket.on('connect', function(){
-  socket.send(json({name:identifier}));
   message({ message: ['System', 'Connected']})
 });
-socket.on('disconnect', function(){ message({ message: ['System', 'Disconnected']})});
+socket.on('disconnect', function(){
+  $(this).prop("emailconfirmed",null);
+  message({ message: ['System', 'Disconnected']})
+});
 //socket.on('reconnect', function(){ message({ message: ['System', 'Reconnected to server']})});
 //socket.on('reconnecting', function( nextRetry ){ message({ message: ['System', 'Attempting to re-connect to the server, next attempt in ' + nextRetry + 'ms']})});
 //socket.on('reconnect_failed', function(){ message({ message: ['System', 'Reconnected to server FAILED.']})});
-
-socket.connect();
 

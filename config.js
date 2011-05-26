@@ -17,7 +17,7 @@ exports.reinit = function(){
 exports.users = function(){
   db.serialize(function(){
     db.run("DROP TABLE IF EXISTS users");
-    db.run("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY ASC, email TEXT)");
+    db.run("CREATE TABLE users(id INTEGER PRIMARY KEY ASC, email TEXT)");
     db.run("CREATE INDEX IF NOT EXISTS email_idx ON users(email)");
     _und.each(users,function(user){
      db.run("INSERT INTO users (id, email) VALUES (NULL, ?)", user);

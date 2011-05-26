@@ -29,15 +29,15 @@ app.configure('production', function(){
 });
 var users = require('./users').config();
 // Routes
+/*app.get('/', function(req, res, next){*/
+  //res.render('index', {
+    //title: 'Obiad Chat',
+    //layout: 'index_layout',
+    //user: users[0]
+  //});
+/*});*/
 app.get('/', function(req, res, next){
-  res.render('index', {
-    title: 'Obiad Chat',
-    layout: 'index_layout',
-    user: users[0]
-  });
-});
-app.get('/chat', function(req, res, next){
-  res.render('chat',{
+  res.render('index',{
     title: 'Obiad Chat'
   });
 });
@@ -58,6 +58,7 @@ var sessions = {};
 socket.on('connection', function(client){
   client.on('message', function(message_json){
     request = JSON.parse(message_json);
+    console.log(request.name)
     if(request.message){
       var client_name = getClient(client);
       var msg = { message: [client_name, request.message] };
