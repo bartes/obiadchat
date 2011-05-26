@@ -7,5 +7,5 @@ task('remigrate', [], function (params) {
 task('users', [], function (params) {
   console.log('putting users to DB');
   var config = require("./config");
-  config.exportUsers();
+  config.users();
 });

@@ -29,9 +29,12 @@ $("form").live("submit", function(){
   if(value.length === 0 ) {
     return;
   }
-  var subelements = value.match(/\:\!([\s\w,.]*);([\s\w,.]*)/);
-  if(subelements) {
-    obj = { order : {text: subelements[1], price: subelements[2]}}
+  var vorder = value.match(/\:\+([^;]+)[;]*([^;]*)/);
+  var vdisorder = value.match(/\:\-*/);
+  if(vorder) {
+    obj = { order : {text: vorder[1], price: vorder[2]}};
+  } else if(vdisorder){
+    obj = { disorder : true};
   } else {
     obj = { message: value };
     message({ message: ['you', value] });

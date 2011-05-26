@@ -27,12 +27,13 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler());
 });
-
+var users = require('./users').config();
 // Routes
 app.get('/', function(req, res, next){
   res.render('index', {
     title: 'Obiad Chat',
-    layout: 'index_layout'
+    layout: 'index_layout',
+    user: users[0]
   });
 });
 app.get('/chat', function(req, res, next){
@@ -81,13 +82,19 @@ socket.on('connection', function(client){
       }
       config.verify(request.name, verifyCallback);
     } else if(request.order) {
-      console.log(request.order)
       var client_name = getClient(client);
       var orderCallback = function(err, rows){
         client.broadcast({ announcement: [client_name , 'made order'] });
         client.send({orders : rows});
       }
       config.order(client_name, request.order.text, request.order.price, orderCallback);
+     } else if(request.disorder) {
+      var client_name = getClient(client);
+      var disorderCallback = function(err, rows){
+        client.broadcast({ announcement: [client_name , 'removed order'] });
+        client.send({orders : rows});
+      }
+      config.disorder(client_name, disorderCallback);
     }
   });
 
