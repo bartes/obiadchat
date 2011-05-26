@@ -19,6 +19,15 @@ function refreshOrder(data){
     $('#orders').append(el);
   });
 }
+function refreshMembers(data){
+  $('#members').html("").append($("<h3>Members:</h3>"))
+  var el;
+  $.each(data, function() {
+    el = $("<p>");
+    el.html('<b>' + this + '</b>');
+    $('#members').append(el);
+  });
+}
 $("form").live("submit", function(){
   var t = $(this).find("input[type=text]");
   var value = t.val();
@@ -53,6 +62,8 @@ socket.on('message', function(obj){
     $.each(obj.buffer, function() {
       message({message: [this.user, this.message]});
     });
+  } else if (obj.members){
+    refreshMembers(obj.members);
   } else if (obj.orders) {
     refreshOrder(obj.orders);
   } else if (obj.disconnect){

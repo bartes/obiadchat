@@ -80,12 +80,16 @@ socket.on('connection', function(client){
         } else {
           client.send({disconnect: true});
         }
+        client.send({members: _und.uniq(_und.values(sessions))});
+        client.broadcast({members: _und.uniq(_und.values(sessions))});
       }
       config.verify(request.name, verifyCallback);
     } else if(request.order) {
       var client_name = getClient(client);
       var orderCallback = function(err, rows){
         client.broadcast({ announcement: [client_name , 'made order'] });
+        //TODO improve all of that
+        client.broadcast({ orders: rows });
         client.send({orders : rows});
       }
       config.order(client_name, request.order.text, request.order.price, orderCallback);
@@ -93,6 +97,8 @@ socket.on('connection', function(client){
       var client_name = getClient(client);
       var disorderCallback = function(err, rows){
         client.broadcast({ announcement: [client_name , 'removed order'] });
+        //TODO improve all of that
+        client.broadcast({ orders: rows });
         client.send({orders : rows});
       }
       config.disorder(client_name, disorderCallback);
