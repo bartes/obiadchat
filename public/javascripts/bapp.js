@@ -26,8 +26,8 @@ $("form").live("submit", function(){
   if(value.length === 0 ) {
     return;
   }
-  var vorder = value.match(/^\:\+([^;]+)[;]*([^;]*)/);
-  var vdisorder = value.match(/^\:\-/);
+  var vorder = value.match(/^\+\+([^;]+)[;]*([^;]*)/);
+  var vdisorder = value.match(/^\-\-/);
   if(!$(this).prop("emailconfirmed")){
     socket.connect();
     $(this).prop("email", value);
