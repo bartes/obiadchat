@@ -13,11 +13,17 @@ body
   color #dddddd
   font-family Helvetica, Arial
   font-size 14px
-  line-height 20px
+  line-height 16px
   height 100%
   background #C0DEED
   overflow-y hidden
 
+.clearfix:after
+  content "."
+  display block
+  height 0
+  clear both
+  visibility hidden
 a img 
   border 0px
 
@@ -31,9 +37,7 @@ form
   margin-left auto
   margin-right auto
 
-#chatWithLegend
-  overflow-y auto
-  overflow-x hidden
+.box 
   -moz-opacity 0.8
   -khtml-opacity 0.8
   opacity 0.8
@@ -41,11 +45,23 @@ form
   -webkit-border-radius 5px
   -khtml-border-radius 5px
   background-color black
-  color white
   border-radius 5px
+  padding 10px
+#chatWithLegend
+  overflow-y auto
+  overflow-x hidden
+  color white
   height 400px
-  padding 20px
-  width: 100%
+  width 60%
+#rightWrapper
+  width 35%
+  float right
+#orders
+  margin-bottom 10px
+  font-size 10px
+#members
+  margin-bottom 10px
+  font-size 10px
 #chat 
   width 68%
   font-size 12px
@@ -55,9 +71,8 @@ form
   font-size 11px
   color yellow
 #legend ul
-  padding: 0
+  padding 0
 #talkbox 
-  width 100%
   height 40px
   background-color white
   -moz-opacity 0.8
