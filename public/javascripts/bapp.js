@@ -28,12 +28,16 @@ function refreshMembers(data){
     $('#members').append(el);
   });
 }
-$("form").live("submit", function(){
+$("#sendbutt").live("click", function(){
+  $(this).parents("form#talkform").trigger("submit");
+  return false;
+})
+$("form#talkform").live("submit", function(){
   var t = $(this).find("input[type=text]");
   var value = t.val();
   var obj, subelements;
   if(value.length === 0 ) {
-    return;
+    return false;
   }
 
   if(!$(this).prop("emailconfirmed")){
