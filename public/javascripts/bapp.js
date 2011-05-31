@@ -43,7 +43,6 @@ $("form#talkform").live("submit", function(){
   if(!$(this).prop("emailconfirmed")){
     socket.connect();
     $(this).prop("email", value);
-    obj = { name : value };
   } else {
     var order_data = value.match(/^\+\+([^;]+)[;]*([^;]*)/);
     var disorder_data = value.match(/^\-\-/);
@@ -55,8 +54,8 @@ $("form#talkform").live("submit", function(){
       obj = { message: value };
       message({ message: ['you', value] });
     }
+    socket.send(json(obj));
   }
-  socket.send(json(obj));
   t.val("");
   return false;
 });
@@ -93,8 +92,8 @@ var parseInput = function(obj){
       case "buffer": onBuffer(obj.buffer); break;
       case "members": refreshMembers(obj.members); break;
       case "orders": refreshOrder(obj.orders); break;
-      case "message": message(obj.message); break;
-      case "announcement": announcement(obj.announcement); break;
+      case "message": message(obj); break;
+      case "announcement": announcement(obj); break;
       case "disconnect": socket.disconnect(); break;
     }
   });
@@ -102,7 +101,10 @@ var parseInput = function(obj){
 
 socket.on('message', parseInput);
 socket.on('connect', function(){
-  message({ message: ['System', 'Connected']})
+  message({ message: ['System', 'Connected']});
+  if($("form").prop("email")) {
+    socket.send(json({name : $("form").prop("email")}));
+  }
 });
 socket.on('disconnect', function(){
   $(this).prop("emailconfirmed",null);

@@ -58,6 +58,7 @@ socket.on('connection', function(client){
       var client_name = getClient(client);
       var msg = { message: [client_name, request.message] };
       config.push(client_name, request.message);
+      console.log(msg.message[0])
       client.broadcast(msg);
     } else if(request.name) {
       var verifyCallback = function(err, row){
@@ -100,7 +101,6 @@ socket.on('connection', function(client){
   client.on('disconnect', function(){
     var client_name = sessions[client.sessionId.toString()];
     delete sessions[client.sessionId.toString()];
-    client.broadcast({ announcement: [client_name, 'disconnected'] });
     client.send({members: _.uniq(_.values(sessions))});
     client.broadcast({members: _.uniq(_.values(sessions))});
   });
