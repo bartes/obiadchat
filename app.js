@@ -1,12 +1,13 @@
-
-/**
- * Module dependencies.
- */
 var express = require('express');
-var _und = require("underscore");
-var app = module.exports = express.createServer();
+var _ = require("underscore");
+var users = require('./users').config();
+var config = require("./config");
+var io = require('socket.io');
+// Framework
 
-// Configuration
+var express = require('express');
+
+var app = module.exports = express.createServer();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
@@ -27,38 +28,32 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler());
 });
-var users = require('./users').config();
-// Routes
-/*app.get('/', function(req, res, next){*/
-  //res.render('index', {
-    //title: 'Obiad Chat',
-    //layout: 'index_layout',
-    //user: users[0]
-  //});
-/*});*/
+
 app.get('/', function(req, res, next){
   res.render('index',{
     title: 'Obiad Chat'
   });
 });
 
-var getClient = function(client){
-  return sessions[client.sessionId.toString()];
-}
 // Only listen on $ node app.js
 if (!module.parent) {
   app.listen(8081);
   console.log("Express server listening on port %d", app.address().port);
 }
-var config = require("./config");
+
+// Configuration
+
+var getClient = function(client){
+  return sessions[client.sessionId.toString()];
+}
+
 // socket.io
-var io = require('socket.io');
 var socket = io.listen(app);
 var sessions = {};
+
 socket.on('connection', function(client){
   client.on('message', function(message_json){
     request = JSON.parse(message_json);
-    console.log(request.name)
     if(request.message){
       var client_name = getClient(client);
       var msg = { message: [client_name, request.message] };
@@ -72,33 +67,30 @@ socket.on('connection', function(client){
           var callback = function(err, rows){
             client.send({buffer: rows});
           }
-          config.all(_und.bind(callback, this));
+          config.all(_.bind(callback, this));
           var callbackOrders = function(err, rows){
             client.send({orders: rows});
           }
-          config.allOrders(_und.bind(callbackOrders, this));
+          config.allOrders(_.bind(callbackOrders, this));
         } else {
           client.send({disconnect: true});
         }
-        client.send({members: _und.uniq(_und.values(sessions))});
-        client.broadcast({members: _und.uniq(_und.values(sessions))});
+        var members =  _.uniq(_.values(sessions));
+        client.send({members: members});
+        client.broadcast({members: members});
       }
       config.verify(request.name, verifyCallback);
     } else if(request.order) {
       var client_name = getClient(client);
       var orderCallback = function(err, rows){
-        client.broadcast({ announcement: [client_name , 'made order'] });
-        //TODO improve all of that
-        client.broadcast({ orders: rows });
+        client.broadcast({ orders: rows, announcement: [client_name , 'made order'] });
         client.send({orders : rows});
       }
       config.order(client_name, request.order.text, request.order.price, orderCallback);
      } else if(request.disorder) {
       var client_name = getClient(client);
       var disorderCallback = function(err, rows){
-        client.broadcast({ announcement: [client_name , 'removed order'] });
-        //TODO improve all of that
-        client.broadcast({ orders: rows });
+        client.broadcast({ orders: rows, announcement: [client_name , 'removed order'] });
         client.send({orders : rows});
       }
       config.disorder(client_name, disorderCallback);
@@ -109,7 +101,7 @@ socket.on('connection', function(client){
     var client_name = sessions[client.sessionId.toString()];
     delete sessions[client.sessionId.toString()];
     client.broadcast({ announcement: [client_name, 'disconnected'] });
-    client.send({members: _und.uniq(_und.values(sessions))});
-    client.broadcast({members: _und.uniq(_und.values(sessions))});
+    client.send({members: _.uniq(_.values(sessions))});
+    client.broadcast({members: _.uniq(_.values(sessions))});
   });
 })
